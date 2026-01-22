@@ -93,6 +93,8 @@ public class ConfigManager {
                 return "&cYou cannot equip elytra while BuilderMode is active!";
             case "plugin-disabled":
                 return "&cBuilderMode is currently disabled!";
+            case "dimension-changed":
+                return "&eYou changed dimensions! Render distance adjusted to {distance} chunks.";
             default:
                 return "&cUnknown message key: " + key;
         }
