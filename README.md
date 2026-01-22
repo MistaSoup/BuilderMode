@@ -145,7 +145,7 @@ src/main/resources/
 5. Current render distance is saved
 6. Render distance is increased to configured value
 7. Movement restrictions are applied:
-   - Cannot ride entities (except all minecart types)
+   - Cannot ride entities (except minecarts)
    - Cannot use or equip elytra
 8. After configured duration, render distance is automatically restored
 9. Cooldown timer starts
@@ -161,12 +161,7 @@ src/main/resources/
 ### Entity Riding
 Players cannot ride any entities **except**:
 - Minecart
-- Chest Minecart
-- Furnace Minecart
-- Hopper Minecart
-- TNT Minecart
-- Command Block Minecart
-- Spawner Minecart
+
 
 ### Elytra
 - Cannot equip elytra (all methods blocked)
