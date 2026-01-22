@@ -1,6 +1,7 @@
 package com.yourname.buildermode;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -13,6 +14,7 @@ public class RenderDistanceManager {
     private final BuilderMode plugin;
     private final ConfigManager configManager;
     private final Map<UUID, Integer> originalRenderDistances = new HashMap<>();
+    private final Map<UUID, World.Environment> originalDimensions = new HashMap<>();
     private final Map<UUID, Object> activeTasks = new HashMap<>();
     private final Map<UUID, Long> expirationTimes = new HashMap<>();
     private final boolean isFolia;
@@ -38,12 +40,15 @@ public class RenderDistanceManager {
         }
         
         int currentDistance = player.getViewDistance();
-        originalRenderDistances.put(player.getUniqueId(), currentDistance);
+        World.Environment currentDimension = player.getWorld().getEnvironment();
         
-        int newDistance = configManager.getRenderDistance(player.getWorld().getEnvironment());
+        originalRenderDistances.put(player.getUniqueId(), currentDistance);
+        originalDimensions.put(player.getUniqueId(), currentDimension);
+        
+        int newDistance = configManager.getRenderDistance(currentDimension);
         player.setViewDistance(newDistance);
         
-        int duration = configManager.getDuration(player.getWorld().getEnvironment());
+        int duration = configManager.getDuration(currentDimension);
         long expirationTime = System.currentTimeMillis() + (duration * 1000L);
         expirationTimes.put(player.getUniqueId(), expirationTime);
         
@@ -87,6 +92,7 @@ public class RenderDistanceManager {
         }
         
         Integer originalDistance = originalRenderDistances.remove(uuid);
+        originalDimensions.remove(uuid);
         expirationTimes.remove(uuid);
         plugin.removeElytraWarning(uuid);
         
@@ -94,6 +100,31 @@ public class RenderDistanceManager {
             player.setViewDistance(originalDistance);
             player.sendMessage(configManager.getMessage("expired"));
         }
+    }
+    
+    public void updateDimension(Player player) {
+        UUID uuid = player.getUniqueId();
+        
+        if (!originalRenderDistances.containsKey(uuid)) {
+            return;
+        }
+        
+        World.Environment newDimension = player.getWorld().getEnvironment();
+        World.Environment originalDimension = originalDimensions.get(uuid);
+        
+        // If this is their first dimension (where they activated), save it
+        if (originalDimension == null) {
+            originalDimensions.put(uuid, newDimension);
+            return;
+        }
+        
+        // Set the new dimension's BuilderMode render distance
+        int newDistance = configManager.getRenderDistance(newDimension);
+        player.setViewDistance(newDistance);
+        
+        String message = configManager.getMessage("dimension-changed")
+            .replace("{distance}", String.valueOf(newDistance));
+        player.sendMessage(message);
     }
     
     public void disableAll() {
@@ -104,6 +135,7 @@ public class RenderDistanceManager {
             }
         }
         originalRenderDistances.clear();
+        originalDimensions.clear();
         activeTasks.clear();
         expirationTimes.clear();
     }
