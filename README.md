@@ -223,7 +223,7 @@ For issues, suggestions, or contributions, please contact the plugin developer.
 
 ## 📄 License
 
-[Your chosen license]
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/MistaSoup/BuilderMode/blob/main/LICENSE.txt) file for details.
 
 ---
 
