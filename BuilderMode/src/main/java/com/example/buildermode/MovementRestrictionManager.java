@@ -8,6 +8,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -147,6 +148,19 @@ public class MovementRestrictionManager implements Listener {
                 player.sendMessage(plugin.getConfigManager().getMessage("cannot-equip-elytra"));
             }
         }
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        Player player = event.getPlayer();
+        
+        // Only update if BuilderMode is active
+        if (!plugin.getRenderDistanceManager().isActive(player)) {
+            return;
+        }
+        
+        // Update the render distance for the new dimension
+        plugin.getRenderDistanceManager().updateDimension(player);
     }
     
     public boolean isWearingElytra(Player player) {
