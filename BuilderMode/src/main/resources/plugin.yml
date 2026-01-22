@@ -1,0 +1,27 @@
+name: BuilderMode
+version: 1.0.0
+main: com.example.buildermode.BuilderMode
+api-version: 1.21
+folia-supported: true
+author: MistaSoup
+description: Temporarily increases render distance with movement restrictions
+
+commands:
+  buildermode:
+    description: Activate BuilderMode to increase render distance
+    usage: /buildermode [on|off|info]
+    aliases: [bm, builder]
+  bmr:
+    description: Reload BuilderMode configuration
+    usage: /bmr
+    permission: buildermode.reload
+
+permissions:
+  buildermode.reload:
+    description: Allows reloading the plugin configuration
+    default: op
+  buildermode.*:
+    description: Grants all BuilderMode permissions
+    default: op
+    children:
+      buildermode.reload: true
