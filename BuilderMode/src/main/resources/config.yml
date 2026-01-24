@@ -1,0 +1,63 @@
+# BuilderMode Configuration
+# All times are in seconds
+
+# Enable or disable the entire plugin
+enabled: true
+
+# Enable verbose logging for debugging and monitoring
+# When enabled, logs dimension changes and safety check resets to console
+verbose: true
+
+# Default render distance to restore after BuilderMode expires
+default-render-distance: 8
+
+# How often (in seconds) to check and reset render distance for players not using BuilderMode
+# This is a safety feature to prevent render distance bypasses or glitches
+# Default: 300 (5 minutes)
+safety-check-interval: 30
+
+# Dimension-specific settings
+dimensions:
+  overworld:
+    # Render distance in chunks while BuilderMode is active
+    render-distance: 18
+    # How long BuilderMode lasts (in seconds)
+    duration: 1200
+    # Cooldown before BuilderMode can be used again (in seconds)
+    cooldown: 1200
+  
+  nether:
+    render-distance: 12
+    duration: 900
+    cooldown: 1200
+  
+  the_end:
+    render-distance: 18
+    duration: 900
+    cooldown: 1200
+
+# Plugin Messages
+# Use & for color codes (e.g., &a = green, &c = red, &e = yellow)
+# Available placeholders: {time}, {distance}, {duration}
+messages:
+  no-permission: "&cYou don't have permission to use this command!"
+  players-only: "&cOnly players can use this command!"
+  config-reloaded: "&aBuildderMode configuration reloaded!"
+  already-active: "&cBuilderMode is already active!"
+  on-cooldown: "&cYou must wait {time} seconds before using BuilderMode again!"
+  activated: "&aBuilderMode activated! Render distance set to {distance} chunks for {duration} seconds."
+  not-active: "&cBuilderMode is not currently active!"
+  disabled-manually: "&eBuilderMode has been disabled manually."
+  expired: "&eBuilderMode has expired. Render distance restored."
+  info-active: "&aBuilderMode is active! Time remaining: &e{time} seconds"
+  info-cooldown: "&eBuilderMode is on cooldown. Time remaining: &c{time} seconds"
+  info-ready: "&aBuilderMode is ready to use!"
+  invalid-usage: "&cUsage: /buildermode [on|off|info]"
+  elytra-warning: "&e&lWARNING: &eYou are wearing an elytra! It will be removed if you activate BuilderMode. Use &6/buildermode on &eagain to confirm."
+  elytra-removed-inventory: "&eYour elytra has been moved to your inventory."
+  elytra-removed-ground: "&eYour elytra has been dropped on the ground (inventory full)."
+  cannot-ride-entity: "&cYou cannot ride entities while BuilderMode is active (except minecarts)!"
+  cannot-use-elytra: "&cYou cannot use elytra while BuilderMode is active!"
+  cannot-equip-elytra: "&cYou cannot equip elytra while BuilderMode is active!"
+  plugin-disabled: "&cBuilderMode is currently disabled!"
+  dimension-disabled: "&eBuilderMode has been disabled because you changed dimensions."
