@@ -241,8 +241,14 @@ public class BuilderMode extends JavaPlugin {
             return true;
         }
         
+        // Check if riding an entity and kick them off if enabled
+        if (configManager.isEntityRidingDisabled() && player.isInsideVehicle()) {
+            player.leaveVehicle();
+            player.sendMessage(configManager.getMessage("dismounted"));
+        }
+        
         // Check for elytra warning
-        if (movementManager.isWearingElytra(player)) {
+        if (configManager.isElytraDisabled() && movementManager.isWearingElytra(player)) {
             if (!elytraWarnings.contains(player.getUniqueId())) {
                 elytraWarnings.add(player.getUniqueId());
                 player.sendMessage(configManager.getMessage("elytra-warning"));
