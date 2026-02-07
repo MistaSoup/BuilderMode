@@ -16,6 +16,26 @@ default-render-distance: 8
 # Default: 300 (5 minutes)
 safety-check-interval: 30
 
+# Feature Restrictions
+# Enable or disable specific BuilderMode restrictions
+restrictions:
+  # Prevent players from using elytra while BuilderMode is active
+  # If enabled: Elytras are removed from chestplate slot and flight is blocked
+  # Requires double-confirmation when activating with elytra equipped
+  disable-elytra: true
+  
+  # Prevent players from riding entities/mobs while BuilderMode is active
+  # If enabled: Players are kicked off entities when activating BuilderMode
+  # Blocks ALL entities and vehicles (horses, camels, pigs, striders, boats, minecarts, etc.)
+  # A repeating check ensures players can't bypass this restriction
+  disable-entity-riding: true
+  
+  # How often (in seconds) to check if BuilderMode players are mounted on entities
+  # If a player is found riding something, they are automatically dismounted
+  # Lower values = more frequent checks but slightly more CPU usage
+  # Set to 0 to disable the repeating check (not recommended)
+  mount-check-interval: 5
+
 # Dimension-specific settings
 dimensions:
   overworld:
@@ -24,7 +44,7 @@ dimensions:
     # How long BuilderMode lasts (in seconds)
     duration: 1200
     # Cooldown before BuilderMode can be used again (in seconds)
-    cooldown: 1200
+    cooldown: 12
   
   nether:
     render-distance: 12
@@ -56,8 +76,10 @@ messages:
   elytra-warning: "&e&lWARNING: &eYou are wearing an elytra! It will be removed if you activate BuilderMode. Use &6/buildermode on &eagain to confirm."
   elytra-removed-inventory: "&eYour elytra has been moved to your inventory."
   elytra-removed-ground: "&eYour elytra has been dropped on the ground (inventory full)."
-  cannot-ride-entity: "&cYou cannot ride entities while BuilderMode is active (except minecarts)!"
+  cannot-ride-entity: "&cYou cannot ride entities while BuilderMode is active!"
   cannot-use-elytra: "&cYou cannot use elytra while BuilderMode is active!"
   cannot-equip-elytra: "&cYou cannot equip elytra while BuilderMode is active!"
   plugin-disabled: "&cBuilderMode is currently disabled!"
   dimension-disabled: "&eBuilderMode has been disabled because you changed dimensions."
+  dismounted: "&eYou have been dismounted from your vehicle."
+  dismounted-check: "&cYou cannot ride entities while BuilderMode is active!"
