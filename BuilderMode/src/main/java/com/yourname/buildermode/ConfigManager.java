@@ -50,6 +50,18 @@ public class ConfigManager {
         return config.getBoolean("verbose", false);
     }
     
+    public boolean isElytraDisabled() {
+        return config.getBoolean("restrictions.disable-elytra", true);
+    }
+    
+    public boolean isEntityRidingDisabled() {
+        return config.getBoolean("restrictions.disable-entity-riding", true);
+    }
+    
+    public long getMountCheckInterval() {
+        return config.getLong("restrictions.mount-check-interval", 5);
+    }
+    
     public String getMessage(String key) {
         String message = config.getString("messages." + key, getDefaultMessage(key));
         return ChatColor.translateAlternateColorCodes('&', message);
@@ -99,6 +111,10 @@ public class ConfigManager {
                 return "&cBuilderMode is currently disabled!";
             case "dimension-disabled":
                 return "&eBuilderMode has been disabled because you changed dimensions.";
+            case "dismounted":
+                return "&eYou have been dismounted from your vehicle.";
+            case "dismounted-check":
+                return "&cYou cannot ride entities while BuilderMode is active!";
             default:
                 return "&cUnknown message key: " + key;
         }
