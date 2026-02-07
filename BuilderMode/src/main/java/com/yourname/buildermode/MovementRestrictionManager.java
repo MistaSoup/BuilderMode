@@ -29,8 +29,10 @@ public class MovementRestrictionManager implements Listener {
         // Start a repeating task to check for elytras
         if (isFolia()) {
             startFoliaElytraCheck();
+            startFoliaMountCheck();
         } else {
             startBukkitElytraCheck();
+            startBukkitMountCheck();
         }
     }
     
@@ -45,6 +47,11 @@ public class MovementRestrictionManager implements Listener {
     
     private void startFoliaElytraCheck() {
         plugin.getServer().getGlobalRegionScheduler().runAtFixedRate(plugin, (task) -> {
+            // Only check if elytra is disabled
+            if (!plugin.getConfigManager().isElytraDisabled()) {
+                return;
+            }
+            
             for (Player player : plugin.getServer().getOnlinePlayers()) {
                 if (plugin.getRenderDistanceManager().isActive(player)) {
                     checkAndRemoveElytra(player);
@@ -55,12 +62,51 @@ public class MovementRestrictionManager implements Listener {
     
     private void startBukkitElytraCheck() {
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
+            // Only check if elytra is disabled
+            if (!plugin.getConfigManager().isElytraDisabled()) {
+                return;
+            }
+            
             for (Player player : plugin.getServer().getOnlinePlayers()) {
                 if (plugin.getRenderDistanceManager().isActive(player)) {
                     checkAndRemoveElytra(player);
                 }
             }
         }, 1L, 10L);
+    }
+    
+    private void startFoliaMountCheck() {
+        long interval = plugin.getConfigManager().getMountCheckInterval() * 20L; // Convert to ticks
+        
+        plugin.getServer().getGlobalRegionScheduler().runAtFixedRate(plugin, (task) -> {
+            // Only check if entity riding is disabled
+            if (!plugin.getConfigManager().isEntityRidingDisabled()) {
+                return;
+            }
+            
+            for (Player player : plugin.getServer().getOnlinePlayers()) {
+                if (plugin.getRenderDistanceManager().isActive(player)) {
+                    checkAndDismount(player);
+                }
+            }
+        }, interval, interval);
+    }
+    
+    private void startBukkitMountCheck() {
+        long interval = plugin.getConfigManager().getMountCheckInterval() * 20L; // Convert to ticks
+        
+        plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
+            // Only check if entity riding is disabled
+            if (!plugin.getConfigManager().isEntityRidingDisabled()) {
+                return;
+            }
+            
+            for (Player player : plugin.getServer().getOnlinePlayers()) {
+                if (plugin.getRenderDistanceManager().isActive(player)) {
+                    checkAndDismount(player);
+                }
+            }
+        }, interval, interval);
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -75,18 +121,17 @@ public class MovementRestrictionManager implements Listener {
             return;
         }
         
-        // Allow minecarts only
-        EntityType type = event.getVehicle().getType();
-        if (type != EntityType.MINECART && 
-            type != EntityType.CHEST_MINECART && 
-            type != EntityType.FURNACE_MINECART && 
-            type != EntityType.HOPPER_MINECART && 
-            type != EntityType.TNT_MINECART && 
-            type != EntityType.COMMAND_BLOCK_MINECART &&
-            type != EntityType.SPAWNER_MINECART) {
-            
-            event.setCancelled(true);
-            player.sendMessage(plugin.getConfigManager().getMessage("cannot-ride-entity"));
+        // Check if entity riding prevention is enabled
+        if (!plugin.getConfigManager().isEntityRidingDisabled()) {
+            return;
+        }
+        
+        // Block ALL vehicle mounting
+        event.setCancelled(true);
+        player.sendMessage(plugin.getConfigManager().getMessage("cannot-ride-entity"));
+        
+        if (plugin.getConfigManager().isVerboseEnabled()) {
+            plugin.getLogger().info("Blocked " + player.getName() + " from mounting " + event.getVehicle().getType());
         }
     }
     
@@ -99,6 +144,11 @@ public class MovementRestrictionManager implements Listener {
         Player player = (Player) event.getEntity();
         
         if (!plugin.getRenderDistanceManager().isActive(player)) {
+            return;
+        }
+        
+        // Check if elytra is disabled
+        if (!plugin.getConfigManager().isElytraDisabled()) {
             return;
         }
         
@@ -117,6 +167,11 @@ public class MovementRestrictionManager implements Listener {
         Player player = (Player) event.getWhoClicked();
         
         if (!plugin.getRenderDistanceManager().isActive(player)) {
+            return;
+        }
+        
+        // Check if elytra is disabled
+        if (!plugin.getConfigManager().isElytraDisabled()) {
             return;
         }
         
@@ -142,6 +197,11 @@ public class MovementRestrictionManager implements Listener {
         Player player = event.getPlayer();
         
         if (!plugin.getRenderDistanceManager().isActive(player)) {
+            return;
+        }
+        
+        // Check if elytra is disabled
+        if (!plugin.getConfigManager().isElytraDisabled()) {
             return;
         }
         
@@ -202,6 +262,19 @@ public class MovementRestrictionManager implements Listener {
     public boolean isWearingElytra(Player player) {
         ItemStack chestplate = player.getInventory().getChestplate();
         return chestplate != null && chestplate.getType() == Material.ELYTRA;
+    }
+    
+    private void checkAndDismount(Player player) {
+        // Check if player is riding/mounted on anything
+        if (player.isInsideVehicle()) {
+            if (plugin.getConfigManager().isVerboseEnabled()) {
+                plugin.getLogger().info("Mount check: Dismounting " + player.getName() + " from " + 
+                    (player.getVehicle() != null ? player.getVehicle().getType() : "unknown"));
+            }
+            
+            player.leaveVehicle();
+            player.sendMessage(plugin.getConfigManager().getMessage("dismounted-check"));
+        }
     }
     
     private void checkAndRemoveElytra(Player player) {
